@@ -1,4 +1,6 @@
 import { StatusBar } from "expo-status-bar";
+import React from 'react';
+
 import {
   StyleSheet,
   Text,
@@ -75,7 +77,7 @@ export default function FeedbackFormContent() {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isSubmitDisabled()) {
       setIsSubmitting(true);
 
@@ -85,6 +87,56 @@ export default function FeedbackFormContent() {
         setName(""), setEmail(""), setNumber(""), setComment("");
       }, 2000);
     }
+    
+      const url = 'https://cors-anywhere.herokuapp.com/https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send';
+    
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RapidAPI-Key': '164cdc9f23msh9a9dba3f6d4302dp15f800jsnebacbe876b9f',
+          'X-RapidAPI-Host': 'rapidprod-sendgrid-v1.p.rapidapi.com',
+        },
+        body: JSON.stringify({
+          personalizations: [
+            {
+              to: [
+                {
+                  email: 'info@redpositive.in',
+                },
+              ],
+              subject: 'Feedback',
+            },
+          ],
+          from: {
+            email: `${email}`,
+          },
+          content: [
+            {
+              type: 'text/plain',
+              value: `Name:${name},
+                      Email:${email},
+                      Mobile:${number},
+                      Message:${comment}`,
+            },
+          ],
+        }),
+      };
+    
+      const requestOptions = {
+        method: options.method,
+        headers: options.headers,
+        body: options.body,
+      };
+    
+      try {
+        const response = await fetch(url, requestOptions);
+        console.log('Request sent successfully.');
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    
+    
   };
 
   return (
@@ -114,7 +166,7 @@ export default function FeedbackFormContent() {
               )}
             </View>
             <View style={styles.inputBody}>
-              <Text style={styles.name}>Mobile Number</Text>
+              <Text style={styles.name}>Contact Number</Text>
               <TextInput
                 placeholder="Number"
                 value={number}
